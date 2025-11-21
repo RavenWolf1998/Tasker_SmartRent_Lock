@@ -1,82 +1,73 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8">
-    <title>Door Status</title>
-    <style>
-      @font-face {
-        font-family: 'Vanilla Pancake';
-        src: url('https://raw.githubusercontent.com/RavenWolf1998/Tasker_Change_Lock_Assets/main/Fonts/vp.otf') format('opentype');
-      }
+<!DOCTYPE html>  <html>  
+  <head>  
+    <meta charset="UTF-8">  
+    <title>Door Status</title>  
+    <style>  
+      @font-face {  
+        font-family: 'Vanilla Pancake';  
+        src: url('https://raw.githubusercontent.com/RavenWolf1998/Tasker_Change_Lock_Assets/main/Fonts/vp.otf') format('opentype');  
+      }  body {  
+    text-align: center;  
+    font-family: 'Vanilla Pancake', sans-serif;  
+    font-size: 50px;  
+    color: white;  
+    background-color: black;  
+    margin: 0;  
+  }  
 
-      body {
-        text-align: center;
-        font-family: 'Vanilla Pancake', sans-serif;
-        font-size: 70px;
-        color: white;
-        background-color: black;
-        margin: 0;
-      }
+  .status {  
+    font-weight: bold;  
+    display: flex;  
+    align-items: center;  
+    justify-content: center;  
+    gap: 10px;  
+    color: orange;  
+  }  
 
-      .status {
-        font-weight: bold;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        color: orange;
-      }
+  img {  
+    height: 50px;  
+  }  
+</style>  
 
-      .door {
-        font-size: 50px;
-        display: flex;
-        align-items: center;
-      }
+<script>  
+  function updateStatus(state) {  
+    const statusDiv = document.getElementById("status");  
+    const iconLeft = document.getElementById("iconLeft");  
+    const iconRight = document.getElementById("iconRight");  
+    const container = document.querySelector(".status");  
 
-      img {
-        height: 70px;
-      }
-    </style>
+    let lockIcon = "https://raw.githubusercontent.com/RavenWolf1998/Tasker_Change_Lock_Assets/main/Images/lock.png";  
+    let unlockIcon = "https://raw.githubusercontent.com/RavenWolf1998/Tasker_Change_Lock_Assets/main/Images/unlock.png";  
+    let hourglass = "https://raw.githubusercontent.com/RavenWolf1998/Tasker_Change_Lock_Assets/main/Gifs/hourglass.gif";  
 
-    <script>
-      function updateStatus(state) {
-        const statusDiv = document.getElementById("status");
-        const iconLeft = document.getElementById("iconLeft");
-        const iconRight = document.getElementById("iconRight");
-        const container = document.querySelector(".status");
+    if (state === "Locked") {  
+      container.style.color = "red";  
+      statusDiv.textContent = "Locked";  
+      iconLeft.src = lockIcon;  
+      iconRight.src = lockIcon;  
+    }   
+    else if (state === "Unlocked") {  
+      container.style.color = "green";  
+      statusDiv.textContent = "Unlocked";  
+      iconLeft.src = unlockIcon;  
+      iconRight.src = unlockIcon;  
+    }   
+    else {  
+      container.style.color = "orange";  
+      statusDiv.textContent = "Loading";  
+      iconLeft.src = hourglass;  
+      iconRight.src = hourglass;  
+    }  
+  }  
+</script>
 
-        let lockIcon = "https://raw.githubusercontent.com/RavenWolf1998/Tasker_Change_Lock_Assets/main/Images/lock.png";
-        let unlockIcon = "https://raw.githubusercontent.com/RavenWolf1998/Tasker_Change_Lock_Assets/main/Images/unlock.png";
-        let hourglass = "https://raw.githubusercontent.com/RavenWolf1998/Tasker_Change_Lock_Assets/main/Gifs/hourglass.gif";
-
-        if (state === "Locked") {
-          container.style.color = "red";
-          statusDiv.textContent = "Locked";
-          iconLeft.src = lockIcon;
-          iconRight.src = lockIcon;
-        } 
-        else if (state === "Unlocked") {
-          container.style.color = "green";
-          statusDiv.textContent = "Unlocked";
-          iconLeft.src = unlockIcon;
-          iconRight.src = unlockIcon;
-        } 
-        else {
-          container.style.color = "orange";
-          statusDiv.textContent = "Loading";
-          iconLeft.src = hourglass;
-          iconRight.src = hourglass;
-        }
-      }
-    </script>
-  </head>
-
-  <body>
-    <div class="status">
-      <span class="door">🚪 =</span>
-      <img id="iconLeft" src="https://raw.githubusercontent.com/RavenWolf1998/Tasker_Change_Lock_Assets/main/Gifs/hourglass.gif" />
-      <span id="status">Loading</span>
-      <img id="iconRight" src="https://raw.githubusercontent.com/RavenWolf1998/Tasker_Change_Lock_Assets/main/Gifs/hourglass.gif" />
-    </div>
-  </body>
+  </head>  
+  <body>  
+   🚪&nbsp;=&nbsp;  
+    <div class="status">  
+      <img id="iconLeft" src="https://raw.githubusercontent.com/RavenWolf1998/Tasker_Change_Lock_Assets/main/Gifs/hourglass.gif" />  
+      <span id="status">Loading</span>  
+      <img id="iconRight" src="https://raw.githubusercontent.com/RavenWolf1998/Tasker_Change_Lock_Assets/main/Gifs/hourglass.gif" />  
+    </div>  
+  </body>  
 </html>
