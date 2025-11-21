@@ -12,11 +12,10 @@
       body {
         text-align: center;
         font-family: 'Vanilla Pancake', sans-serif;
-        font-size: 70px;
+        font-size: 60px;
         color: white;
         background-color: black;
         margin: 0;
-        -webkit-font-smoothing: none; /* 🔥 removes glowing bar */
       }
 
       .status {
@@ -28,14 +27,8 @@
         color: orange;
       }
 
-      /* Extra protection for glow removal */
-      .status span {
-        -webkit-font-smoothing: none;
-        text-shadow: 0 0 0 transparent;
-      }
-
       img {
-        height: 70px;
+        height: 60px;
       }
     </style>
 
@@ -52,31 +45,30 @@
 
         if (state === "Locked") {
           container.style.color = "red";
-          statusDiv.textContent = "Locked.";
+          statusDiv.textContent = "Locked";
           iconLeft.src = lockIcon;
           iconRight.src = lockIcon;
-        }
+        } 
         else if (state === "Unlocked") {
           container.style.color = "green";
-          statusDiv.textContent = "Unlocked.";
+          statusDiv.textContent = "Unlocked";
           iconLeft.src = unlockIcon;
           iconRight.src = unlockIcon;
-        }
+        } 
         else {
           container.style.color = "orange";
-          statusDiv.textContent = "Loading.";
+          statusDiv.textContent = "Loading";
           iconLeft.src = hourglass;
           iconRight.src = hourglass;
         }
       }
     </script>
-
   </head>
   <body>
     The 🚪 is<br>
     <div class="status">
       <img id="iconLeft" src="https://raw.githubusercontent.com/RavenWolf1998/Tasker_Change_Lock_Assets/main/Gifs/hourglass.gif" />
-      <span id="status">Loading.</span>
+      <span id="status">Loading</span>
       <img id="iconRight" src="https://raw.githubusercontent.com/RavenWolf1998/Tasker_Change_Lock_Assets/main/Gifs/hourglass.gif" />
     </div>
   </body>
