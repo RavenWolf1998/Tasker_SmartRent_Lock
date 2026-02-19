@@ -1,1 +1,117 @@
+name: Auto-update TaskerNet XML
 
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "0 */6 * * *" # every 6 hours (UTC)
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Download XML from TaskerNet
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # --- CONFIG ---
+          SHARE_URL="https://taskernet.com/shares/?id=Project%3ASmartRent+Lock&user=AS35m8kAvMdHxMcZWUHxogA0OqtiL0mGCaQp%2F5ixnyHbF4DUADkWjQidt5VEaYZBfMpNNpUctEkh"
+          TARGET_DIR="Project XML"
+          TARGET_FILE="SmartRent Lock.prj.xml"
+          # --------------
+
+          mkdir -p "$TARGET_DIR"
+          TARGET_PATH="$TARGET_DIR/$TARGET_FILE"
+
+          echo "Target path: $TARGET_PATH"
+          echo "Share URL: $SHARE_URL"
+
+          TMP_XML="/tmp/remote.xml"
+          TMP_HTML="/tmp/share.html"
+
+          download_ok="false"
+
+          # Try likely direct download variations first
+          candidates=(
+            "${SHARE_URL}&download=1"
+            "${SHARE_URL}&download=true"
+            "${SHARE_URL}&dl=1"
+            "${SHARE_URL}&xml=1"
+          )
+
+          for u in "${candidates[@]}"; do
+            echo "Trying: $u"
+            if curl -L --fail --silent --show-error "$u" -o "$TMP_XML"; then
+              # Basic sanity check: looks like XML
+              if head -c 200 "$TMP_XML" | grep -qE '<\?xml|<TaskerData|<Project'; then
+                echo "Downloaded XML via candidate URL."
+                download_ok="true"
+                break
+              fi
+            fi
+          done
+
+          # Fallback: scrape the share page for a download link that looks like XML
+          if [ "$download_ok" != "true" ]; then
+            echo "Falling back to scraping share page for the XML download link..."
+            curl -L --fail --silent --show-error "$SHARE_URL" -o "$TMP_HTML"
+
+            # Look for a URL that includes "download" and "xml"
+            # (TaskerNet pages can vary; this is a best-effort scraper)
+            dl_path="$(grep -Eo 'href="[^"]+"' "$TMP_HTML" \
+              | sed 's/^href="//;s/"$//' \
+              | grep -iE 'download.*xml|xml.*download|download' \
+              | head -n 1 || true)"
+
+            if [ -z "$dl_path" ]; then
+              echo "ERROR: Could not find a download link on the TaskerNet page."
+              exit 1
+            fi
+
+            # Turn relative link into absolute if needed
+            if [[ "$dl_path" == /* ]]; then
+              dl_url="https://taskernet.com${dl_path}"
+            elif [[ "$dl_path" == http* ]]; then
+              dl_url="$dl_path"
+            else
+              dl_url="https://taskernet.com/${dl_path}"
+            fi
+
+            echo "Found possible download link: $dl_url"
+            curl -L --fail --silent --show-error "$dl_url" -o "$TMP_XML"
+
+            if ! head -c 200 "$TMP_XML" | grep -qE '<\?xml|<TaskerData|<Project'; then
+              echo "ERROR: Downloaded file doesn't look like XML."
+              exit 1
+            fi
+          fi
+
+          # Compare + update only if changed
+          if [ -f "$TARGET_PATH" ] && cmp -s "$TMP_XML" "$TARGET_PATH"; then
+            echo "No changes detected."
+            echo "CHANGED=false" >> "$GITHUB_ENV"
+          else
+            echo "Changes detected. Updating repo file."
+            cp "$TMP_XML" "$TARGET_PATH"
+            echo "CHANGED=true" >> "$GITHUB_ENV"
+          fi
+
+      - name: Commit and push if changed
+        if: env.CHANGED == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add "Project XML/SmartRent Lock.prj.xml"
+          git commit -m "Auto-update SmartRent Lock XML from TaskerNet"
+          git push
